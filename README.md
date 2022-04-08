@@ -2,6 +2,13 @@ Repository contains examples of distributed training jobs with Pytorch.
 
 The models can be trained on single GPU instances as well as in production environment, e.g. SLURM.
 
+# AWS
+## AWS Batch
+* Overall Set up Instruction https://docs.aws.amazon.com/batch/latest/userguide/get-set-up-for-aws-batch.html
+
+### CLI 
+
+
 ### CharNN
 
 The model is a simple minGPT model that supports the following features:
