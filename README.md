@@ -4,7 +4,10 @@ The models can be trained on single GPU instances as well as in production envir
 
 # AWS
 ## AWS Batch
-* Overall Set up Instruction https://docs.aws.amazon.com/batch/latest/userguide/get-set-up-for-aws-batch.html
+1. Overall Set up Instruction https://docs.aws.amazon.com/batch/latest/userguide/get-set-up-for-aws-batch.html
+  * Config AWS, IAM, Key Pair, VPC, Security Group
+2. Create Batch through Wizard: https://docs.aws.amazon.com/batch/latest/userguide/Batch_GetStarted.html
+  * NOTE: the instruction order is messed on the web.  
 
 ### CLI 
 
