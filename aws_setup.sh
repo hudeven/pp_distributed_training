@@ -13,6 +13,7 @@ if [ "$install_venv" = true ]
 then
     # sudo apt-get install python3-venv
     sudo apt-get install python3.8 python3.8-dev python3.8-distutils python3.8-venv
+    python3.8 -m venv env
 fi
 
 # https://phoenixnap.com/kb/how-to-install-docker-on-ubuntu-18-04
@@ -38,7 +39,7 @@ fi
 # DON'T EVER CHANGE DEFAULT PYTHON!!!
 # https://askubuntu.com/questions/1197683/how-do-i-install-python-3-8-in-lubuntu-18-04
 # If need to update python version: https://tech.serhatteker.com/post/2019-12/upgrade-python38-on-ubuntu/
-python3.8 -m venv env
+
 source env/bin/activate
 
 if [ "$build_docker_image" = true ]
