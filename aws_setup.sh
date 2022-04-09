@@ -61,7 +61,7 @@ if [ "$submit_batch" = true ]
 then
     AWS_DEFAULT_REGION=us-west-2 \
     torchx run --workspace "" -s aws_batch -cfg queue=torchx-gpu dist.ddp \
-    --script apps/charnn/main.py --image $ECR_URL/bwen:charnn --cpu 4 --gpu 4 -j 2x4
+    --script charnn/main.py --image $ECR_URL/bwen:charnn --cpu 4 --gpu 4 -j 2x4
 fi
 
 deactivate
