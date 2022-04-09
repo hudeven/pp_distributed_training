@@ -3,8 +3,15 @@
 set -x
 
 install_docker=false
+install_venv=false
 login_ecr=false
 build_docker_image=false
+install_torchx=false
+
+if [ "$install_venv" = true ]
+then
+    sudo apt-get install python3-venv
+fi
 
 # https://phoenixnap.com/kb/how-to-install-docker-on-ubuntu-18-04
 if [ "$install_docker" = true ]
@@ -25,9 +32,20 @@ then
     aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $ECR_URL
 fi 
 
+python3 -m venv env
+source env/bin/activate
+
 if [ "$build_docker_image" = true ]
 then
     docker build -f Dockerfile -t charnn:latest ./
     docker tag charnn:latest $ECR_URL/bwen:charnn
-    docker push $IMAGE_URI
+    docker push $ECR_URL/bwen:charnn
 fi
+
+if [ "$install_torchx" = true ]
+then
+    sudo apt install python3-pip
+    pip3 install torch 
+    pip3 install torchx
+
+deactivate
