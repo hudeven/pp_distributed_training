@@ -6,3 +6,7 @@ COPY ./requirements.txt ./
 RUN pip3 install -r requirements.txt
 ## Copy script
 COPY ./* ./
+
+# docker run -it charnn:latest /bin/bash
+#   Does not seem to work -- much slower than `torchrun charnn/main.py`
+#   torchrun --standalone --nnodes=1 --nproc_per_node=2 charnn/main.py
