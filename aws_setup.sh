@@ -79,7 +79,7 @@ source env/bin/activate
 # export ECR_URL=<ERC repo URL>
 if [ "$build_docker_image" = true ]
 then
-    docker build -f Dockerfile -t charnn:latest ./
+    docker build -f docker/Dockerfile -t charnn:latest ./
     docker tag charnn:latest $ECR_URL:charnn
     docker push $ECR_URL:charnn
 fi
@@ -100,7 +100,10 @@ then
     nvidia-smi
     python3 -c "import torch; torch.cuda.is_available()"
     torchx run --workspace "" -s local_docker dist.ddp \
-    --script apps/charnn/main.py --image $ECR_URL:charnn --cpu 4 --gpu 4 -j 1x4
+        --script apps/charnn/main.py --image $ECR_URL:charnn --cpu 4 --gpu 4 -j 1x4
+    # OR interactive mode
+    # docker run -it --rm --gpus all charnn:latest /bin/bash
+    # torchrun --standalone --nnodes=1 --nproc_per_node=2 apps/charnn/main.py
 fi
 
 if [ "$submit_batch" = true ]

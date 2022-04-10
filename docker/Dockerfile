@@ -9,7 +9,7 @@ RUN pip3 install wheel
 RUN pip3 install setuptools==59.5.0
 RUN pip3 install -r requirements.txt
 ## Copy script
-COPY ./apps /workspace/disttrain/
+COPY . /workspace/disttrain
 
 # Single Run: docker run -it charnn:latest /bin/bash
 # Access GPU: docker run -it --rm --gpus all charnn:latest /bin/bash
