@@ -1,6 +1,7 @@
-FROM python:3.8-buster
+FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-runtime
 ## Working directory
-WORKDIR /app
+# cannot freely modify as it is related to data dir
+WORKDIR /workspace/disttrain
 
 COPY ./requirements.txt ./
 ## Install Requirements
