@@ -3,6 +3,7 @@
 # Set up MLFlow server on EC2
 # https://aws.plainenglish.io/set-up-mlflow-on-aws-ec2-using-docker-s3-and-rds-90d96798e555
 
+# This commands in this script are run on dev server
 set -x
 
 build_docker_image=false
