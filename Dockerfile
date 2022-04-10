@@ -1,8 +1,11 @@
 FROM python:3.8-buster
 ## Working directory
 WORKDIR /app
+
 COPY ./requirements.txt ./
 ## Install Requirements
+RUN pip3 install wheel
+RUN pip3 install setuptools==59.5.0
 RUN pip3 install -r requirements.txt
 ## Copy script
 COPY ./* ./

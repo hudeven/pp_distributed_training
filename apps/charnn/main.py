@@ -4,6 +4,7 @@
 #
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
+import logging
 
 import os
 from typing import Optional, Tuple
@@ -24,6 +25,8 @@ import socket
 from omegaconf import DictConfig
 
 import hydra
+
+logger = logging.getLogger(__name__)
 
 
 def get_fq_hostname() -> str:
@@ -46,6 +49,7 @@ def get_job_name():
 
 def get_device() -> Optional[int]:
     if not torch.cuda.is_available():
+        logger.warning("NO GPU!!")
         return None
     return int(os.environ['LOCAL_RANK'])
 

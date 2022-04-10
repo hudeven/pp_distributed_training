@@ -3,4 +3,5 @@ fsspec
 s3fs
 numpy
 tensorboard
-torch>=1.11.0
+--find-links https://download.pytorch.org/whl/cu113
+torch==1.11.0

@@ -8,6 +8,17 @@ login_ecr=false
 build_docker_image=false
 install_torchx=false
 submit_batch=false
+install_nvidia_driver=false
+
+if [ "$install_nvidia_driver" = true ]
+then
+    # if need a purge and fix: https://askubuntu.com/questions/753923/nvidia-smi-hangs-cannot-be-killed-even-by-sigkill
+    sudo add-apt-repository ppa:graphics-drivers/ppa
+    sudo apt-get update
+    sudo apt install -y nvidia-driver--470
+    sudo reboot !!!
+    sudo nvidia-smi -pm 1
+fi
 
 if [ "$install_venv" = true ]
 then
@@ -45,23 +56,26 @@ source env/bin/activate
 if [ "$build_docker_image" = true ]
 then
     docker build -f Dockerfile -t charnn:latest ./
-    docker tag charnn:latest $ECR_URL/bwen:charnn
-    docker push $ECR_URL/bwen:charnn
+    docker tag charnn:latest $ECR_URL:charnn
+    docker push $ECR_URL:charnn
 fi
 
 if [ "$install_torchx" = true ]
 then
-    pip3 install wheel
-    pip3 install torch 
+    pip3 install -r requirements.txt
     pip3 install torchx
-    pip3 install boto3
+    pip3 install boto3 # AWS SDK for Python: https://aws.amazon.com/sdk-for-python/
 fi
 
 if [ "$submit_batch" = true ]
 then
     AWS_DEFAULT_REGION=us-west-2 \
     torchx run --workspace "" -s aws_batch -cfg queue=torchx-gpu dist.ddp \
-    --script charnn/main.py --image $ECR_URL/bwen:charnn --cpu 4 --gpu 4 -j 2x4
+    --script charnn/main.py --image $ECR_URL:charnn --cpu 4 --gpu 4 -j 2x4
 fi
+
+# check cuda
+# nvidia-smi
+# python3 -c "import torch; torch.cuda.is_available()"
 
 deactivate
