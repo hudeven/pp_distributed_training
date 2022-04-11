@@ -11,8 +11,10 @@ python3 -c "import torch; torch.cuda.is_available()"
 
 if [ "$run_mode" = "local_torchx" ]
 then
+    # takes a very long time to get console work
+    # if resource is not sufficient, will fail without much usefo info
     torchx run --workspace "" -s local_docker dist.ddp \
-        --script apps/charnn/main.py --image charnn:latest --cpu 4 --gpu 4 -j 1x4
+        --script apps/charnn/main.py --image $ECR_URL:charnn --cpu 4 --gpu 4 -j 1x4 --memMB 51200
 elif [ "$run_mode" = "local_elastic_gpu" ]
 then
     docker run --rm --gpus all charnn:latest torchrun --standalone --nnodes=1 --nproc_per_node=2 apps/charnn/main.py
@@ -28,7 +30,8 @@ elif [ "$run_mode" = "submit_batch" ]
 then
     AWS_DEFAULT_REGION=us-west-2 \
     torchx run --workspace "" -s aws_batch -cfg queue=torchx-gpu dist.ddp \
-    --script apps/charnn/main.py --image $ECR_URL:charnn --cpu 4 --gpu 4 -j 2x4
+    --script apps/charnn/main.py --image $ECR_URL:charnn --cpu 4 --gpu 4 -j 2x4 \
+    --memMB 51200
 fi
 
 deactivate

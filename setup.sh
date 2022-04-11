@@ -49,23 +49,4 @@ then
     pip3 install boto3 
 fi
 
-if [ "$start_local_run" = true ]
-then
-    # check cuda
-    nvidia-smi
-    python3 -c "import torch; torch.cuda.is_available()"
-    torchx run --workspace "" -s local_docker dist.ddp \
-        --script apps/charnn/main.py --image $ECR_URL:charnn --cpu 4 --gpu 4 -j 1x4
-    # OR interactive mode
-    # docker run -it --rm --gpus all charnn:latest /bin/bash
-    # torchrun --standalone --nnodes=1 --nproc_per_node=2 apps/charnn/main.py
-fi
-
-if [ "$submit_batch" = true ]
-then
-    AWS_DEFAULT_REGION=us-west-2 \
-    torchx run --workspace "" -s aws_batch -cfg queue=torchx-gpu dist.ddp \
-    --script apps/charnn/main.py --image $ECR_URL:charnn --cpu 4 --gpu 4 -j 2x4
-fi
-
 deactivate
