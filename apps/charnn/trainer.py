@@ -19,6 +19,7 @@ from torch.utils.data import Dataset
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.tensorboard import SummaryWriter
+import mlflow
 
 logger = logging.getLogger(__name__)
 
@@ -160,6 +161,8 @@ class Trainer:
                 if it % 100 == 0:
                     print(
                         f"{self.rank}: epoch {epoch + 1} iter {it}: train loss {train_batch_loss:.5f}")
+                    # TODO: this way of logging loss within an epoch is not ideal
+                    mlflow.log_metric(f"train_loss.poch{epoch}", train_batch_loss, step=it)
 
             self.model.eval()
             for it, (x, y) in enumerate(test_loader):

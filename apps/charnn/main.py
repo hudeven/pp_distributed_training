@@ -19,6 +19,8 @@ from torch.distributed.fsdp import FullyShardedDataParallel as FSDP, CPUOffload
 import torch.distributed as dist
 from torch.utils.data import random_split
 import uuid
+import mlflow
+from logging_utils import MlflowLogger
 
 import torch
 import socket
@@ -131,12 +133,18 @@ def get_dataset_path(cfg: DictConfig) -> str:
 def main(cfg: DictConfig):
     set_env()
     device = get_device()
-    data_path = get_dataset_path(cfg)
-    job_name = get_job_name()
-    print(f"{get_fq_hostname()}:{os.getpid()}:{device} Running charNN {job_name}, data_path: {data_path}")
     if device is not None:
         torch.cuda.set_device(device)
     setup_process_group()
+
+    mlflow_logger = MlflowLogger(
+        experiment_name=cfg["experiment_name"],
+        mlflow_server_url=cfg["mlflow_server_url"],
+    )
+
+    data_path = get_dataset_path(cfg)
+    job_name = get_job_name()
+    logger.info(f"{get_fq_hostname()}:{os.getpid()}:{device} Running charNN {job_name}, data_path: {data_path}")
 
     block_size = 128  # spatial extent of the model for its context
     dataset = CharDataset(data_path, block_size)
@@ -147,33 +155,38 @@ def main(cfg: DictConfig):
     train_dataset, test_dataset = random_split(dataset, [train_len, datalen - train_len])
 
     opt_conf = OptimizerConfig(lr=cfg['opt']['lr'], weight_decay=cfg['opt']['weight_decay'])
+    mlflow_logger.log_param_dataclass(opt_conf)
 
     mconf = GPTConfig(vocab_size=dataset.vocab_size,
-                      block_size=dataset.block_size,
-                      n_layer=cfg['model']['n_layer'],
-                      n_head=cfg['model']['n_head'],
-                      n_embd=cfg['model']['n_embd'])
+                    block_size=dataset.block_size,
+                    n_layer=cfg['model']['n_layer'],
+                    n_head=cfg['model']['n_head'],
+                    n_embd=cfg['model']['n_embd'])
+    mlflow_logger.log_param_dataclass(mconf)
 
     train_cfg = cfg['trainer']
     tconf = TrainerConfig(job_name=job_name,
-                          max_epochs=train_cfg['max_epochs'],
-                          batch_size=train_cfg['batch_size'],
-                          data_loader_workers=train_cfg['data_loader_workers'],
-                          enable_profile=train_cfg['enable_profile'],
-                          log_dir=train_cfg.get('log_dir'),
-                          checkpoint_path=train_cfg.get("checkpoint_path"), )
+                        max_epochs=train_cfg['max_epochs'],
+                        batch_size=train_cfg['batch_size'],
+                        data_loader_workers=train_cfg['data_loader_workers'],
+                        enable_profile=train_cfg['enable_profile'],
+                        log_dir=train_cfg.get('log_dir'),
+                        checkpoint_path=train_cfg.get("checkpoint_path"), )
+    mlflow_logger.log_param_dataclass(tconf)
+
     checkpoint = load_checkpoint(tconf.checkpoint_path)
     model, optimizer = get_model_and_optimizer(cfg['charnn']['dist'], mconf, opt_conf, checkpoint)
 
     if cfg['charnn']['task'] == 'train':
         trainer = Trainer(model, optimizer, train_dataset, test_dataset, tconf, device,
-                          checkpoint.finished_epoch + 1 if checkpoint else 0)
+                        checkpoint.finished_epoch + 1 if checkpoint else 0)
         trainer.fit()
     elif cfg['charnn']['task'] == 'generate':
         generate_seq(cfg, model, train_dataset)
     else:
         raise RuntimeError(f"Unknown task: {cfg['charnn']['task']}")
 
+    mlflow_logger.log_model(model, "model")
 
 if __name__ == "__main__":
     main()

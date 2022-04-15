@@ -25,6 +25,7 @@ fi
 if [ "$login_ecr" = true ]
 then
     # Dev server: awsume api 495572122715 SSOAdmin
+    # Needed in order to push docker image to ECR
     aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $ECR_URL
 fi 
 

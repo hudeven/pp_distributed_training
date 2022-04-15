@@ -30,3 +30,6 @@ deactivate
 
 # Set up ECS manually https://www.youtube.com/watch?v=zs3tyVgiBQQ
 # <public_dns>:8888/#/ -- IMPORTANT -- DO NOT include http or https!
+
+# If start docker on standalone EC2 instance, remember to bind port with -p !!
+# docker run --name mlflow-tracking -p 5000:5000 mlflow_server:latest

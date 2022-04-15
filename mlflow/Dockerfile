@@ -2,6 +2,7 @@ FROM python:3.8.8
 
 RUN apt-get update
 RUN apt-get install -y python3-pip
+RUN apt-get update && apt-get upgrade -y && apt-get install -y git
 RUN pip3 install mlflow==1.24.0 boto3
 
 WORKDIR /mlflow
