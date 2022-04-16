@@ -6,7 +6,7 @@ set -x
 
 run_mode="local_torchx"
 
-
+source env/bin/activate
 python3 -c "import torch; torch.cuda.is_available()"
 
 if [ "$run_mode" = "local_torchx" ]

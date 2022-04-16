@@ -7,6 +7,8 @@ COPY ./requirements.txt /workspace/disttrain
 ## Install Requirements
 RUN pip3 install wheel
 RUN pip3 install setuptools==59.5.0
+ARG aws
+RUN if [ "$aws" = true ]; then pip3 install boto3; fi
 # failed to import Git error: https://github.com/mlflow/mlflow/issues/2564
 RUN apt-get update && apt-get upgrade -y && apt-get install -y git
 RUN pip3 install -r requirements.txt

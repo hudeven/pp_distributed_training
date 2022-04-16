@@ -138,6 +138,7 @@ def main(cfg: DictConfig):
     setup_process_group()
 
     mlflow_logger = MlflowLogger(
+        switch=cfg.get("experiment_name", None) is None,
         experiment_name=cfg["experiment_name"],
         mlflow_server_url=cfg["mlflow_server_url"],
     )
@@ -178,8 +179,16 @@ def main(cfg: DictConfig):
     model, optimizer = get_model_and_optimizer(cfg['charnn']['dist'], mconf, opt_conf, checkpoint)
 
     if cfg['charnn']['task'] == 'train':
-        trainer = Trainer(model, optimizer, train_dataset, test_dataset, tconf, device,
-                        checkpoint.finished_epoch + 1 if checkpoint else 0)
+        trainer = Trainer(
+            model, 
+            optimizer, 
+            train_dataset, 
+            test_dataset, 
+            tconf, 
+            device,
+            checkpoint.finished_epoch + 1 if checkpoint else 0,
+            mlflow_logger,
+        )
         trainer.fit()
     elif cfg['charnn']['task'] == 'generate':
         generate_seq(cfg, model, train_dataset)

@@ -6,7 +6,7 @@ opt:
 dataset:
   path: ./data/input.txt
 trainer:
-  max_epochs: 2
+  max_epochs: 1
   lr: 0.0006
   batch_size: 216
   data_loader_workers: 1

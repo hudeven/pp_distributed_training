@@ -35,7 +35,7 @@ source env/bin/activate
 # export ECR_URL=<ERC repo URL>
 if [ "$build_docker_image" = true ]
 then
-    docker build -f ./Dockerfile -t charnn:latest ./ # --no-cache
+    docker build -f ./Dockerfile -t charnn:latest ./ --build-arg aws=true # --no-cache
     docker tag charnn:latest $ECR_URL:charnn
     docker push $ECR_URL:charnn
 fi

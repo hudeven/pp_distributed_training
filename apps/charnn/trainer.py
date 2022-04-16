@@ -19,7 +19,7 @@ from torch.utils.data import Dataset
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.tensorboard import SummaryWriter
-import mlflow
+from logging_utils import MlflowLogger
 
 logger = logging.getLogger(__name__)
 
@@ -75,21 +75,24 @@ def load_checkpoint(checkpoint_path: Optional[str]) -> Optional[Checkpoint]:
 
 
 class Trainer:
-
-    def __init__(self,
-                 model: torch.nn.Module,
-                 optimizer: optim.Optimizer,
-                 train_dataset: Dataset,
-                 test_dataset: Dataset,
-                 config: TrainerConfig,
-                 device: Optional[int] = None,
-                 start_epoch: int = 0):
+    def __init__(
+        self,
+        model: torch.nn.Module,
+        optimizer: optim.Optimizer,
+        train_dataset: Dataset,
+        test_dataset: Dataset,
+        config: TrainerConfig,
+        tracking_logger: MlflowLogger, 
+        device: Optional[int] = None,
+        start_epoch: int = 0,
+    ):
         self.model = model
         self.optimizer = optimizer
         self.train_dataset = train_dataset
         self.test_dataset = test_dataset
         self.config = config
         self.start_epoch = start_epoch
+        self.tracking_logger = tracking_logger,
 
         self.device = device
         self.rank = int(os.environ['RANK'])
@@ -162,7 +165,7 @@ class Trainer:
                     print(
                         f"{self.rank}: epoch {epoch + 1} iter {it}: train loss {train_batch_loss:.5f}")
                     # TODO: this way of logging loss within an epoch is not ideal
-                    mlflow.log_metric(f"train_loss.poch{epoch}", train_batch_loss, step=it)
+                    self.tracking_logger.log_metric(f"train_loss.poch{epoch}", train_batch_loss, step=it)
 
             self.model.eval()
             for it, (x, y) in enumerate(test_loader):
