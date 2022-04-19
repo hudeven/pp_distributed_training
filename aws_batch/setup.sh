@@ -14,19 +14,27 @@ then
     # takes a very long time to get console work
     # if resource is not sufficient, will fail without much usefo info
     torchx run --workspace "" -s local_docker dist.ddp \
-        --script apps/charnn/main.py --image $ECR_URL:charnn --cpu 4 --gpu 4 -j 1x4 --memMB 51200 \
+        --script apps/charnn/main.py --image $ECR_URL:charnn --cpu 4 --gpu 4 -j 1x4 --memMB 20480 \
         --env NCCL_SOCKET_IFNAME=eth0
 elif [ "$run_mode" = "local_elastic_gpu" ]
 then
-    docker run --rm --gpus all --env AWS_ACCESS_KEY_ID=<> --env AWS_SECRET_ACCESS_KEY=<> \
-    --env AWS_SESSION_TOKEN=<> \
+    docker run --rm --gpus all --env AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+    --env AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+    --env AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
     charnn:latest torchrun --standalone --nnodes=1 --nproc_per_node=2 apps/charnn/main.py
 elif [ "$run_mode" = "local_elastic_cpu" ]
 then
-    docker run charnn:latest torchrun apps/charnn/main.py
+    docker run charnn:latest --env AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+    --env AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+    --env AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
+    torchrun apps/charnn/main.py
 elif ["$run_mode" = "local_interactive" ]
 then
-    docker run -it --rm --gpus all charnn:latest /bin/bash
+    docker run -it --rm --gpus all \
+    --env AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+    --env AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+    --env AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
+    charnn:latest /bin/bash
     # then run 
     # torchrun --standalone --nnodes=1 --nproc_per_node=2 apps/charnn/main.py
 elif [ "$run_mode" = "submit_batch" ]
