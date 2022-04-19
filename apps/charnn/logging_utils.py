@@ -5,7 +5,7 @@ import torch
 from typing import Optional
 import time    
 import logging
-
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ def rank_0_only(func):
 
 def optional_class(switch_arg):
     def decorator(Cls):
-        class Wrapper:
+        class OptionalClass:
             def __init__(self, *args, **kwargs):
                 self.switch_off = kwargs.get(switch_arg, None) is None
                 if not self.switch_off:
@@ -55,7 +55,7 @@ def optional_class(switch_arg):
                     return dummy_f
                 return self.decorated_obj.__getattribute__(s)
 
-        return Wrapper  # decoration ends here
+        return OptionalClass  # decoration ends here
 
     return decorator
 
@@ -71,6 +71,7 @@ class MlflowLogger:
         self._rank, self._world_size = get_dist_info()
         if mlflow_server_url:
             mlflow.set_tracking_uri(mlflow_server_url)
+            os.environ["MLFLOW_S3_ENDPOINT_URL"] = mlflow_server_url
         if not mlflow.get_experiment_by_name(experiment_name):
             try:
                 mlflow.create_experiment(name=experiment_name) 
@@ -89,10 +90,10 @@ class MlflowLogger:
             mlflow.log_param(field, getattr(dc, field))
 
     @rank_0_only
-    def log_model(self, model: torch.nn.Module) -> None:
-        mlflow.pytorch.log_model(model, "model")
+    def log_model(self, model: torch.nn.Module, name: str = "model") -> None:
+        mlflow.pytorch.log_model(model, name)
 
-    def log_metrics(self, name, val, step) -> None:
+    def log_metric(self, name, val, step) -> None:
         mlflow.log_metric(name, val, step)
 
     def __del__(self) -> None:

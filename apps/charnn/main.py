@@ -43,7 +43,6 @@ def set_env():
     os.environ['LOCAL_RANK'] = os.environ.get("LOCAL_RANK", "0")
     os.environ['TORCHELASTIC_RUN_ID'] = os.environ.get("TORCHELASTIC_RUN_ID", str(uuid.uuid4()).split('-')[0])
 
-
 def get_job_name():
     uid = os.environ['TORCHELASTIC_RUN_ID']
     return f"test-job-{uid}"
@@ -138,7 +137,6 @@ def main(cfg: DictConfig):
     setup_process_group()
 
     mlflow_logger = MlflowLogger(
-        switch=cfg.get("experiment_name", None) is None,
         experiment_name=cfg["experiment_name"],
         mlflow_server_url=cfg["mlflow_server_url"],
     )
@@ -185,11 +183,11 @@ def main(cfg: DictConfig):
             train_dataset, 
             test_dataset, 
             tconf, 
+            mlflow_logger,
             device,
             checkpoint.finished_epoch + 1 if checkpoint else 0,
-            mlflow_logger,
         )
-        trainer.fit()
+        trainer.fit(cfg.get("max_iter", -1))
     elif cfg['charnn']['task'] == 'generate':
         generate_seq(cfg, model, train_dataset)
     else:

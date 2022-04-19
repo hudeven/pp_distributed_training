@@ -92,7 +92,7 @@ class Trainer:
         self.test_dataset = test_dataset
         self.config = config
         self.start_epoch = start_epoch
-        self.tracking_logger = tracking_logger,
+        self.tracking_logger = tracking_logger
 
         self.device = device
         self.rank = int(os.environ['RANK'])
@@ -134,7 +134,7 @@ class Trainer:
 
         return loss.item()
 
-    def run_epoch(self, epoch: int) -> None:
+    def run_epoch(self, epoch: int, max_iter: int = -1) -> None:
         train_sampler = DistributedSampler(self.train_dataset, rank=self.rank, num_replicas=self.world_size,
                                            shuffle=True)
         train_loader = DataLoader(self.train_dataset,
@@ -166,7 +166,8 @@ class Trainer:
                         f"{self.rank}: epoch {epoch + 1} iter {it}: train loss {train_batch_loss:.5f}")
                     # TODO: this way of logging loss within an epoch is not ideal
                     self.tracking_logger.log_metric(f"train_loss.poch{epoch}", train_batch_loss, step=it)
-
+                if max_iter > 0 and it >= max_iter:
+                    break
             self.model.eval()
             for it, (x, y) in enumerate(test_loader):
                 x = x.to(self.device)
@@ -177,7 +178,8 @@ class Trainer:
                 if it % 100 == 0:
                     print(
                         f"{self.rank}: epoch {epoch + 1} iter {it}: test loss {test_batch_loss:.5f}")
-
+                if max_iter > 0 and it >= max_iter:
+                    break
             save_checkpoint(self.config.checkpoint_path, self.model, self.optimizer, epoch)
 
         finally:
@@ -186,6 +188,6 @@ class Trainer:
             if self.tb_writer:
                 self.tb_writer.flush()
 
-    def fit(self):
+    def fit(self, max_iter: int = -1):
         for epoch in range(self.start_epoch, self.config.max_epochs):
-            self.run_epoch(epoch)
+            self.run_epoch(epoch, max_iter)

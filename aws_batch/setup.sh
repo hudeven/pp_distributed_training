@@ -18,7 +18,9 @@ then
         --env NCCL_SOCKET_IFNAME=eth0
 elif [ "$run_mode" = "local_elastic_gpu" ]
 then
-    docker run --rm --gpus all charnn:latest torchrun --standalone --nnodes=1 --nproc_per_node=2 apps/charnn/main.py
+    docker run --rm --gpus all --env AWS_ACCESS_KEY_ID=<> --env AWS_SECRET_ACCESS_KEY=<> \
+    --env AWS_SESSION_TOKEN=<> \
+    charnn:latest torchrun --standalone --nnodes=1 --nproc_per_node=2 apps/charnn/main.py
 elif [ "$run_mode" = "local_elastic_cpu" ]
 then
     docker run charnn:latest torchrun apps/charnn/main.py
