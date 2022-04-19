@@ -71,7 +71,6 @@ class MlflowLogger:
         self._rank, self._world_size = get_dist_info()
         if mlflow_server_url:
             mlflow.set_tracking_uri(mlflow_server_url)
-            os.environ["MLFLOW_S3_ENDPOINT_URL"] = mlflow_server_url
         if not mlflow.get_experiment_by_name(experiment_name):
             try:
                 mlflow.create_experiment(name=experiment_name) 
