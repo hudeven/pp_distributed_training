@@ -6,6 +6,7 @@ from typing import Optional
 import time    
 import logging
 import os
+import atexit
 
 logger = logging.getLogger(__name__)
 
@@ -82,6 +83,7 @@ class MlflowLogger:
             experiment_id=experiment.experiment_id, 
             run_name=f"{int(time.time())}.rank{self._rank}",
         )
+        atexit.register(self.end)
     
     @rank_0_only
     def log_param_dataclass(self, dc) -> None:
@@ -95,5 +97,5 @@ class MlflowLogger:
     def log_metric(self, name, val, step) -> None:
         mlflow.log_metric(name, val, step)
 
-    def __del__(self) -> None:
+    def end(self) -> None:
         mlflow.end_run()
