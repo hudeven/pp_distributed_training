@@ -4,7 +4,9 @@ s3fs
 numpy
 tensorboard
 mlflow==1.24.0
---find-links https://download.pytorch.org/whl/cu113/torch_stable.html
-torch==1.11.0+cu113
---find-links https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
-torcharrow
+--find-links https://download.pytorch.org/whl/nightly/cu113/torch_nightly.html
+torch --pre torch 
+# --find-links https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
+# torcharrow
+--find-links https://download.pytorch.org/whl/nightly/torchdata.html
+torchdata

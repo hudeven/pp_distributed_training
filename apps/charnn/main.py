@@ -11,7 +11,7 @@ from typing import Optional, Tuple
 from model import GPT, GPTConfig, OptimizerConfig, create_optimizer
 from model_fsdp import ShardedGPT
 from trainer import Trainer, TrainerConfig, Checkpoint, load_checkpoint
-from char_dataset import CharDataset
+from char_dataset import get_dataset, CharDataset
 from utils import sample
 from torch.nn.parallel import DistributedDataParallel
 from torch.distributed.fsdp.wrap import enable_wrap, wrap
@@ -146,7 +146,7 @@ def main(cfg: DictConfig):
     logger.info(f"{get_fq_hostname()}:{os.getpid()}:{device} Running charNN {job_name}, data_path: {data_path}")
 
     block_size = 128  # spatial extent of the model for its context
-    dataset = CharDataset(data_path, block_size)
+    dataset = get_dataset(data_path, block_size)
 
     datalen = len(dataset)
     train_len = int(datalen * 0.9)

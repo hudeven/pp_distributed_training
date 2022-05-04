@@ -4,7 +4,7 @@ opt:
   lr: 0.0006
   weight_decay: 0.1
 dataset:
-  path: ./data/input.txt
+  path: s3://charnn-data/data/input.txt  # ./data/input.txt
 max_iter: 2
 trainer:
   max_epochs: 1
