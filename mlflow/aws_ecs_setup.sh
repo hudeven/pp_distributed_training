@@ -26,7 +26,12 @@ then
     docker push $ECR_URL:mlflow_server
 fi
 
+# check which port is listening
+curl ifconfig.me
+sudo lsof -i -P -n | grep LISTEN
+
 deactivate
+
 
 # Set up ECS manually https://www.youtube.com/watch?v=zs3tyVgiBQQ
 # <public_dns>:8888/#/ -- IMPORTANT -- DO NOT include http or https!
