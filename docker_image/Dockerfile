@@ -3,7 +3,7 @@ FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-runtime
 # cannot freely modify as it is related to data dir
 WORKDIR /workspace/disttrain
 
-COPY ./requirements.txt /workspace/disttrain
+COPY docker_image/requirements.txt /workspace/disttrain
 ## Install Requirements
 RUN pip3 install wheel
 RUN pip3 install setuptools==59.5.0

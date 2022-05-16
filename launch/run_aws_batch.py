@@ -6,7 +6,8 @@ set -x
 
 run_mode="local_torchx"
 
-source env/bin/activate
+# source env/bin/activate
+
 python3 -c "import torch; torch.cuda.is_available()"
 
 # NOTE: we do not provide temp credentials if IAM instanceRole for 
@@ -25,7 +26,7 @@ then
     # takes a very long time to get console work
     # if resource is not sufficient, will fail without much usefo info
     torchx run --workspace "" -s local_docker dist.ddp \
-        --script apps/charnn/main.py --image $ECR_URL:charnn --cpu 4 --gpu 4 -j 1x4 --memMB 20480 \
+        --script apps/charnn/main.py --image $ECR_URL:charnn --cpu 4 --gpu 2 -j 1x2 --memMB 20480 \
         --env NCCL_SOCKET_IFNAME=eth0
 elif [ "$run_mode" = "local_elastic_gpu" ]
 then
@@ -48,4 +49,4 @@ fi
 # Get large files: sudo find / -type f -size +1G -exec ls -lh {} \;
 # Get disk usage: df -h
 
-deactivate
+# deactivate

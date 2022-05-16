@@ -9,15 +9,15 @@ max_iter: 2
 trainer:
   max_epochs: 1
   lr: 0.0006
-  batch_size: 216
+  batch_size: 128 # 216
   data_loader_workers: 1
   enable_profile: False
   # checkpoint_path
   # log_dir
 model:
-  n_layer: 8
-  n_head: 8
-  n_embd: 512
+  n_layer: 2 # 8
+  n_head: 2 # 8
+  n_embd: 128 # 512
 charnn:
   # ddp, fsdp
   dist: ddp
