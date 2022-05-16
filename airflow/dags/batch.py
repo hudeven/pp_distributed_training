@@ -37,13 +37,12 @@ dag = DAG(
 # For real prod, should use python API instead 
 t1 = BashOperator(
     task_id="charnn_batch",
-    bash_command="echo {{ ECR_URL }}",
-    # "AWS_DEFAULT_REGION=us-west-2 \
-    # torchx run --workspace '' -s aws_batch \
-    # -cfg queue=torchx-gpu,image_repo={{ ECR_URL }} dist.ddp \
-    # --script ~/projects/charnn/disttraining/apps/charnn/main.py --image {{ ECR_URL }}:charnn --cpu 4 --gpu 4 -j 2x4 \
-    # --memMB 20480 --env NCCL_SOCKET_IFNAME=eth0 2>&1 \
-    # | grep -Eo 'aws_batch://torchx/torchx-gpu:main-[a-z0-9]+'",
+    bash_command="AWS_DEFAULT_REGION=us-west-2 \
+    torchx run --workspace '' -s aws_batch \
+     -cfg queue=torchx-gpu,image_repo={{ ECR_URL }} dist.ddp \
+     --script apps/charnn/main.py --image {{ ECR_URL }}:charnn --cpu 4 --gpu 4 -j 2x4 \
+     --memMB 20480 --env NCCL_SOCKET_IFNAME=eth0 2>&1 \
+     | grep -Eo 'aws_batch://torchx/torchx-gpu:main-[a-z0-9]+'",
     dag=dag,
     do_xcom_push=True,
     # Somehow the following does not work. Maybe due to env is emplated
@@ -70,17 +69,17 @@ def wait_for_job(**context) -> bool:
     except:
         return False
 
-# t2 = PythonOperator(
-#     task_id="wait_for_batch",
-#     python_callable=wait_for_job,
-#     provide_context=True,
-#     dag=dag,
-# )
+t2 = PythonOperator(
+    task_id="wait_for_batch",
+    python_callable=wait_for_job,
+    provide_context=True,
+    dag=dag,
+)
 
-# t3 = BashOperator(
-#     task_id="parse_output",
-#     bash_command="echo batch result: {{ ti.xcom_pull(task_ids='wait_for_batch') }}",
-#     dag=dag,
-# )
+t3 = BashOperator(
+    task_id="parse_output",
+    bash_command="echo batch result: {{ ti.xcom_pull(task_ids='wait_for_batch') }}",
+    dag=dag,
+)
 
-t1 #>> t2 >> t3
+t1 >> t2 >> t3

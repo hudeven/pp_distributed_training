@@ -1,2 +1,2 @@
-git+https://github.com/pytorch/torchx.git#egg=torchx
+apache-airflow[celery]==2.3.0 --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.3.0/constraints-3.8.txt"
 boto3

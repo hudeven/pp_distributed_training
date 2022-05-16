@@ -6,7 +6,7 @@ set -x
 
 run_mode="local_torchx"
 
-# source env/bin/activate
+source env/bin/activate
 
 python3 -c "import torch; torch.cuda.is_available()"
 
@@ -49,4 +49,4 @@ fi
 # Get large files: sudo find / -type f -size +1G -exec ls -lh {} \;
 # Get disk usage: df -h
 
-# deactivate
+deactivate
