@@ -53,8 +53,7 @@ python apps/charnn/main.py
 
 Executing single process with torch elastic under Docker image env:
 ```bash
-cd aws_batch
-docker build -f Dockerfile -t charnn:latest ./
+docker build -f aws_batch/Dockerfile -t charnn:latest ./
 docker run -it charnn:latest /bin/bash
 torchrun apps/charnn/main.py
 ```
