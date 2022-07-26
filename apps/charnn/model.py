@@ -25,7 +25,7 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 from torch.distributed.fsdp.wrap import wrap
-from torch.distributed.algorithms._checkpoint._checkpoint_wrapper import checkpoint_wrapper
+from torch.distributed.algorithms._checkpoint.checkpoint_wrapper import checkpoint_wrapper
 
 logger = logging.getLogger(__name__)
 
