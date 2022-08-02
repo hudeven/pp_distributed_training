@@ -6,8 +6,8 @@
 # This commands in this script are run on dev server
 set -x
 
-build_docker_image=false
-login_ecr=false
+build_docker_image=true
+login_ecr=true
 
 if [ "$login_ecr" = true ]
 then
@@ -22,8 +22,8 @@ source env/bin/activate
 if [ "$build_docker_image" = true ]
 then
     docker build -f Dockerfile -t mlflow_server:latest ./
-    docker tag mlflow_server:latest $ECR_URL:mlflow_server
-    docker push $ECR_URL:mlflow_server
+    docker tag mlflow_server:latest $ECR_URL/mlflow_server:latest
+    docker push $ECR_URL/mlflow_server:latest
 fi
 
 # check which port is listening
