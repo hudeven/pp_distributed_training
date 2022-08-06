@@ -1,8 +1,10 @@
 from datetime import timedelta
 import logging
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
-from airflow.utils.dates import days_ago
+from airflow.operators.python import PythonOperator
+import pendulum
+
+
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
@@ -17,7 +19,7 @@ dag = DAG(
     default_args=default_args,
     description='A simple DAG with a few Python tasks.',
     schedule_interval=timedelta(days=1),
-    start_date=days_ago(2),
+    start_date=pendulum.today('UTC').add(days=-2),
     tags=['example'],
 )
 # PYTHON FUNCTIONS
@@ -29,6 +31,7 @@ def log_context(**kwargs):
 
 
 def compute_product(a=None, b=None):
+    print(f"Inputs: a={a}, b={b}")
     logging.info(f"Inputs: a={a}, b={b}")
     if a == None or b == None:
         return None
@@ -48,3 +51,5 @@ t2 = PythonOperator(
     dag=dag
 )
 t1 >> t2
+
+print("done")

@@ -3,9 +3,9 @@ import logging
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
-from airflow.utils.dates import days_ago
 
 import os
+import pendulum
 from airflow.providers.amazon.aws.hooks.batch_waiters import BatchWaitersHook
 import boto3.session
 
@@ -24,7 +24,7 @@ dag = DAG(
     description="A simple DAG with submitting Batch Job.",
     schedule_interval="@daily",
     catchup=False,
-    start_date=days_ago(10), # https://github.com/apache/airflow/issues/13322#issuecomment-936457291
+    start_date=pendulum.today('UTC').add(days=-10),
     tags=["aws_batch"],
     user_defined_macros={
         "ECR_URL": os.environ["ECR_URL"],
@@ -72,7 +72,6 @@ def wait_for_job(**context) -> bool:
 t2 = PythonOperator(
     task_id="wait_for_batch",
     python_callable=wait_for_job,
-    provide_context=True,
     dag=dag,
 )
 
