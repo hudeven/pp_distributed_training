@@ -4,10 +4,13 @@
 
 set -x
 
-install_nvidia_driver=false
-install_docker=false
-install_software=false
+install_docker=true
+install_nvidia_driver=true
+install_nvidia_container_toolkit=true
+install_software=true
 install_venv=false
+init_venv=false
+
 
 # === Set up machine overall === #
 
@@ -16,7 +19,7 @@ install_venv=false
 if [ "$install_docker" = true ]
 then
     sudo apt-get update
-    sudo apt-get remove docker docker-engine docker.io
+    sudo apt-get remove docker docker-engine docker.io -y
     sudo apt install docker.io
     sudo systemctl start docker
     sudo systemctl enable docker
