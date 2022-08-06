@@ -8,6 +8,6 @@ RUN pip3 install mlflow==1.24.0 boto3
 WORKDIR /mlflow
 EXPOSE 5000
 
-ENV STORAGE_URL s3://bwen-mlflow-artifacts
+ENV STORAGE_URL s3://paved-path-prototype
 
 CMD mlflow server --backend-store-uri ./mlruns --default-artifact-root $STORAGE_URL/mlflow_artifacts/ --host 0.0.0.0 --port 5000
